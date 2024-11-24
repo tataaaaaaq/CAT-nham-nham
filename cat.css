@@ -1,0 +1,40 @@
+#fundo {
+   position: absolute;
+   left:45vw;
+   width: 45vw;
+   height: 40vw;
+   background-image: url("./imagens/background.png");
+  }
+.inimigo{
+  position: absolute;
+  top: 35vw;
+  left: 35vw; 
+  width: 4vw; 
+  height: 3vw; 
+  background-image: url("./imagens/fantasma.png");
+}
+#div1 {
+  position: absolute;
+  top: 35vw;
+  left: 35vw; 
+  width: 5vw; 
+  height: 5vw;
+}
+.bullets {
+  position: absolute;
+  top: 34vw;
+  width: 2vw;
+  height: 2vw;
+  background-image: url("./imagens/bola_de_fogo.png");
+}
+.painel {
+  position: absolute;
+   top: 15vw; 
+   left:10vw; 
+   text-align: center;
+} 
+
+
+ 
+
+
