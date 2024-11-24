@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./CAT.css">
+</head>
+<body>
+    <div class="fundo" id="fundo">
+		
+        <div id="div1">
+            <img alt="tete" src="./imagens/tete.png">
+        </div>
+    </div>	
+
+    <div class="painel">
+        <button type="button" id="iniciar">Iniciar</button><br> 
+		<button type="button" id="reiniciar">Reniciar</button><br>
+        <hr>
+        <button type="button" id="cima">Cima</button>
+        <hr>
+        <button type="button" id="esquerda">Esquerda</button>
+        <button type="button" id="direita">Direita</button><br>
+        <hr>
+        <button type="button" id="baixo">Baixo</button><br>
+        <hr>
+        <button type="button" id="atirar">Atirar</button><br>
+    </div>
+
+	<script>
+		// Variáveis globais
+		let parado = true;
+		let timerDiv1; // controlado pelos botões
+		let timerInimigos;
+		let podeAtirar = true;
+		let bala;
+		let timerBala;
+		let inimigos = [];
+		let timerCriarInimigo; // Movimento automático
+		let timerColisao; // teste de colisão
+		
+		// Referência ao elemento "div1"
+		const div1 = document.querySelector("#div1");
+		const fundo = document.querySelector("#fundo"); // Adicionando referência ao fundo
+		
+		// Adiciona evento ao botão iniciar
+		document.querySelector("#iniciar").addEventListener("click", iniciar);
+		
+
+		// garante que o botão de reiniciar seja invisivel
+		document.querySelector("#reiniciar").style.visibility = "hidden";
+
+		// ***** Funções ******* //
+		
+		function iniciar() {
+        musica = new Audio('audio/tete.mp3');
+        musica.play(); 
+        //musica.volume = 0.05;
+        musica.loop = true;
+            // Posicionamento inicial
+			div1.style.left = "25vw";
+			div1.style.top = "25vw";    
+			
+			// Ativa os botões do painel de controle
+			document.querySelector("#atirar").addEventListener("click", atirar);
+			addButtonListeners(); // Adiciona os eventos aos botões de movimento
+		
+			// Deixa o botão iniciar invisível
+			document.querySelector("#iniciar").style.visibility = "hidden";
+		}
+		
+		function addButtonListeners() {
+			// Movimento para desktop
+			document.querySelector("#esquerda").addEventListener("mousedown", () => mover("esquerda"));
+			document.querySelector("#direita").addEventListener("mousedown", () => mover("direita"));
+			document.querySelector("#cima").addEventListener("mousedown", () => mover("cima"));
+			document.querySelector("#baixo").addEventListener("mousedown", () => mover("baixo"));
+			document.querySelectorAll("button").forEach(button => button.addEventListener("mouseup", parar));
+		
+			// Movimento para celular
+			document.querySelector("#esquerda").addEventListener("touchstart", () => mover("esquerda"));
+			document.querySelector("#direita").addEventListener("touchstart", () => mover("direita"));
+			document.querySelector("#cima").addEventListener("touchstart", () => mover("cima"));
+			document.querySelector("#baixo").addEventListener("touchstart", () => mover("baixo"));
+			document.querySelectorAll("button").forEach(button => button.addEventListener("touchend", parar));
+		}
+		
+		function parar() {
+			clearInterval(timerDiv1);
+			parado = true;
+		}
+		
+		function mover(Direcao) {
+			if (!parado) {
+				clearInterval(timerDiv1);
+			}
+			if (Direcao == "direita") {
+				timerDiv1 = setInterval("direita()", 15);
+				parado = false;
+			}
+			if (Direcao == "esquerda") {
+				timerDiv1 = setInterval("esquerda()", 15);
+				parado = false;
+			}
+			if (Direcao == "cima") {
+				timerDiv1 = setInterval("cima()", 15);
+				parado = false;
+			}
+			if (Direcao == "baixo") {
+				timerDiv1 = setInterval("baixo()", 15);
+				parado = false;
+			}
+			colisaoInimigoJogador(div1, inimigo);
+		}
+		
+		// Funções de movimentação
+		function direita() {
+			let div1Left = parseInt(getComputedStyle(div1).left);
+			let fundoWidth = parseInt(getComputedStyle(fundo).width);
+			let div1Width = parseInt(getComputedStyle(div1).width);
+		
+			div1.style.left = div1Left + 3 + "px";
+			if (div1Left >= fundoWidth - div1Width + 5) {
+				div1.style.left = fundoWidth - div1Width + 5 + "px";
+				clearInterval(timerDiv1);
+			}
+		}
+		
+		function esquerda() {
+			let div1Left = parseInt(getComputedStyle(div1).left);
+		
+			div1.style.left = div1Left - 3 + "px";
+			if (div1Left <= 1) {
+				div1.style.left = "1px";
+				clearInterval(timerDiv1);
+			}
+		}
+		
+		function cima() {
+			let div1Top = parseInt(getComputedStyle(div1).top);
+		
+			div1.style.top = div1Top - 3 + "px";
+			if (div1Top <= 0) {
+				div1.style.top = "0px";
+				clearInterval(timerDiv1);
+			}
+		}
+		
+		function baixo() {
+			let div1Top = parseInt(getComputedStyle(div1).top);
+			let fundoHeight = parseInt(getComputedStyle(fundo).height);
+			let div1Height = parseInt(getComputedStyle(div1).height);
+		
+			div1.style.top = div1Top + 3 + "px";
+			if (div1Top >= fundoHeight - div1Height - 18) {
+				div1.style.top = fundoHeight - div1Height - 18 + "px";
+				clearInterval(timerDiv1);
+			}
+		}
+		
+		function atirar() {
+			if (podeAtirar) {
+				bala = document.createElement("div");
+				bala.classList.add("bullets");
+				bala.style.left = parseInt(getComputedStyle(div1).left) + "px";
+				bala.style.top = parseInt(getComputedStyle(div1).top) + "px";
+				fundo.appendChild(bala);
+				podeAtirar = true;
+				timerBala = setInterval(() => moveBala(bala), 1);
+				musica = new Audio('audio/tiro.mp3');
+                musica.play(); 
+                //musica.volume = 0.05;
+			}
+		}
+		
+		function moveBala(bala) {
+			let top = parseInt(getComputedStyle(bala).top);
+			bala.style.top = top - 3 + "px";
+			if (top <= 0) {
+				bala.parentElement.removeChild(bala);
+				clearInterval(timerBala);
+				//retirei daq podeAtirar = true;
+			}
+		}
+		
+		// Função para criar inimigo (mantendo o nome)
+		function inimigo() {
+			const novoInimigo = document.createElement("div");
+			novoInimigo.classList.add("inimigo");
+			fundo.appendChild(inimigo);
+		}
+		
+		// Função para criar inimigos em posições aleatórias
+	function criarInimigo() {
+    const inimigo = document.createElement("div");
+    inimigo.classList.add("inimigo");
+
+    // Posição inicial aleatória (horizontal aleatória no topo da tela)
+    inimigo.style.left = Math.random() * 40 + "vw";
+    inimigo.style.top = "0px";
+
+    fundo.appendChild(inimigo);
+    inimigos.push(inimigo);
+
+    // Inicia o movimento do inimigo
+    moverInimigo(inimigo);
+}
+
+// Função para movimentar os inimigos
+function moverInimigo(inimigo) {
+    const velocidade = Math.random() * 2 + 1; // Velocidade aleatória entre 1 e 3
+    const movimento = setInterval(() => {
+        let top = parseInt(getComputedStyle(inimigo).top);
+        inimigo.style.top = top + velocidade + "px";
+
+        if (top >= fundo.offsetHeight) {
+            inimigo.remove();
+            clearInterval(movimento);
+            inimigos = inimigos.filter((el) => el !== inimigo);
+        }
+	verificarColisao(inimigo, movimento);
+	colisaoInimigoJogador(div1, inimigo);
+    }, 30);
+}
+
+function verificarColisao(inimigo, movimento) {
+    const balas = document.querySelectorAll(".bullets");
+
+    balas.forEach((bala) => {
+        const balaRect = bala.getBoundingClientRect();
+        const inimigoRect = inimigo.getBoundingClientRect();
+
+        if (
+            balaRect.left < inimigoRect.right &&
+            balaRect.right > inimigoRect.left &&
+            balaRect.top < inimigoRect.bottom &&
+            balaRect.bottom > inimigoRect.top
+        ) {
+            // Remover bala e inimigo
+            bala.remove();
+            inimigo.remove();
+            clearInterval(movimento);
+
+            // Remover inimigo da lista
+            inimigos = inimigos.filter((el) => el !== inimigo);
+        }
+    });
+}
+
+function colisaoInimigoJogador(div1, inimigo){
+	inimigos.forEach(inimigo =>{
+		const div1Rect = div1.getBoundingClientRect();
+		const inimigoRect = inimigo.getBoundingClientRect();
+		if (
+			div1Rect.left < inimigoRect.rigth &&
+			div1Rect.rigth > inimigoRect.left &&
+			div1Rect.top < inimigoRect.bottom &&
+			div1Rect.bottom > inimigoRect.top) {
+            // para o jogo
+            clearInterval(movimento);
+			clerarInterval(timerBala);
+			clearInterval(timerdiv1);
+			clearInterval(timerInimigos);
+			parado = true;
+			podeAtirar = false;
+			document.querySelector("#reiniciar").style.visibility = "visible";
+        }
+	});
+}
+function iniciarJogo() {
+    timerCriarInimigo = setInterval(criarInimigo, 2000);
+    iniciar();
+}
+document.querySelector("#iniciar").addEventListener("click", iniciarJogo);
+
+
+        </script>		
+	</body>
+</html>
