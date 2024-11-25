@@ -121,10 +121,9 @@ button:hover {
 }
 
 @media (max-width: 480px) {
-   #div1 img {
+   #div1 {
        width: 15vw; 
        height: 15vw;
-      object-fit:contain;
    }
 
    .painel {
