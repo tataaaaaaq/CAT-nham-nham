@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="CAT.css">
+</head>
+<body>
+    <div class="fundo" id="fundo">
+		
+        <div id="div1">
+            <img alt="tete" src="./imagens/tete.png">
+        </div>
+    </div>	
+
+	<div class="painel">
+		<!-- Linha para o botão iniciar e eu add o de reiniciar -->
+		<div class="linha">
+			<button type="button" id="iniciar">Iniciar</button>
+			<button type="button" id="reiniciar">Reiniciar</button>
+		</div>
+		<hr>
+		<!-- Linha para o botão de direção Cima -->
+		<div class="linha">
+			<button type="button" id="cima">▲</button>
+		</div>
+		<!-- Linha para os botões esquerda aixo  direita -->
+		<div class="linha">
+			<button type="button" id="esquerda">◄</button>
+			<button type="button" id="baixo">▼</button>
+			<button type="button" id="direita">►</button>
+		</div>
+		<hr>
+		<!-- Linha para o botão atirar -->
+		<div class="linha">
+			<button type="button" id="atirar">Atirar</button>
+		</div>
+	</div>	
+	
+	<div id="cronometro" style="font-size: 24px; text-align: center;">01:20</div>
+
+    <div id="fimJogo" style="display: none; text-align: center;">
+	</div>
+
+	<script>
+		// Variáveis globais
+		let parado = true;
+		let timerDiv1; // controlado pelos botões
+		let podeAtirar = true;
+		let bala;
+		let timerBala;
+		let inimigos = [];
+		let timerCriarInimigo; // Movimento automático
+		let timerColisao; // teste de colisão
+		let cronometroTimer;
+        let tempoRestante = 80; // 1 minuto e 20s
+		
+		// Referência ao elemento "div1"
+		const div1 = document.querySelector("#div1");
+		const fundo = document.querySelector("#fundo"); // Adicionando referência ao fundo
+		const cronometro = document.querySelector("#cronometro"); //aspartir dessa foram add
+        const fimJogo = document.querySelector("#fimJogo");
+        const botaoReiniciar = document.querySelector("#reiniciar");
+
+
+		
+		// Adiciona evento ao botão iniciar
+		document.querySelector("#iniciar").addEventListener("click", iniciar); 
+		
+		// ***** Funções ******* //
+		
+		function iniciar() {
+        musica = new Audio('audio/tete.mp3');
+        musica.play(); 
+        musica.volume = 0.20;
+        musica.loop = true;
+            // Posicionamento inicial
+			div1.style.left = "25vw";
+			div1.style.top = "25vw";    
+			
+			// Ativa os botões do painel de controle
+			document.querySelector("#atirar").addEventListener("click", atirar);
+			addButtonListeners(); // Adiciona os eventos aos botões de movimento
+		
+			// Deixa o botão iniciar invisível
+			document.querySelector("#iniciar").style.visibility = "hidden";
+			iniciarCronometro();
+
+			document.querySelector("#reiniciar").addEventListener("click", () => { //add esse tbm
+    window.location.reload();
+});
+		}
+		
+		function addButtonListeners() {
+			// Movimento para desktop
+			document.querySelector("#esquerda").addEventListener("mousedown", () => mover("esquerda"));
+			document.querySelector("#direita").addEventListener("mousedown", () => mover("direita"));
+			document.querySelector("#cima").addEventListener("mousedown", () => mover("cima"));
+			document.querySelector("#baixo").addEventListener("mousedown", () => mover("baixo"));
+			document.querySelectorAll("button").forEach(button => button.addEventListener("mouseup", parar));
+		
+			// Movimento para celular
+			document.querySelector("#esquerda").addEventListener("touchstart", () => mover("esquerda"));
+			document.querySelector("#direita").addEventListener("touchstart", () => mover("direita"));
+			document.querySelector("#cima").addEventListener("touchstart", () => mover("cima"));
+			document.querySelector("#baixo").addEventListener("touchstart", () => mover("baixo"));
+			document.querySelectorAll("button").forEach(button => button.addEventListener("touchend", parar));
+		}
+		
+		function parar() {
+			clearInterval(timerDiv1);
+			parado = true;
+		}
+		
+		function mover(Direcao) {
+			if (!parado) {
+				clearInterval(timerDiv1);
+			}
+			if (Direcao == "direita") {
+				timerDiv1 = setInterval("direita()", 15);
+				parado = false;
+			}
+			if (Direcao == "esquerda") {
+				timerDiv1 = setInterval("esquerda()", 15);
+				parado = false;
+			}
+			if (Direcao == "cima") {
+				timerDiv1 = setInterval("cima()", 15);
+				parado = false;
+			}
+			if (Direcao == "baixo") {
+				timerDiv1 = setInterval("baixo()", 15);
+				parado = false;
+			}
+		}
+		
+		// Funções de movimentação
+		function direita() {
+			let div1Left = parseInt(getComputedStyle(div1).left);
+			let fundoWidth = parseInt(getComputedStyle(fundo).width);
+			let div1Width = parseInt(getComputedStyle(div1).width);
+		
+			div1.style.left = div1Left + 3 + "px";
+			if (div1Left >= fundoWidth - div1Width + 5) {
+				div1.style.left = fundoWidth - div1Width + 5 + "px";
+				clearInterval(timerDiv1);
+			}
+		}
+		
+		function esquerda() {
+			let div1Left = parseInt(getComputedStyle(div1).left);
+		
+			div1.style.left = div1Left - 3 + "px";
+			if (div1Left <= 1) {
+				div1.style.left = "1px";
+				clearInterval(timerDiv1);
+			}
+		}
+		
+		function cima() {
+			let div1Top = parseInt(getComputedStyle(div1).top);
+		
+			div1.style.top = div1Top - 3 + "px";
+			if (div1Top <= 0) {
+				div1.style.top = "0px";
+				clearInterval(timerDiv1);
+			}
+		}
+		
+		function baixo() {
+			let div1Top = parseInt(getComputedStyle(div1).top);
+			let fundoHeight = parseInt(getComputedStyle(fundo).height);
+			let div1Height = parseInt(getComputedStyle(div1).height);
+		
+			div1.style.top = div1Top + 3 + "px";
+			if (div1Top >= fundoHeight - div1Height - 18) {
+				div1.style.top = fundoHeight - div1Height - 18 + "px";
+				clearInterval(timerDiv1);
+			}
+		}
+		
+		function atirar() {
+			if (podeAtirar) {
+				bala = document.createElement("div");
+				bala.classList.add("bullets");
+				bala.style.left = parseInt(getComputedStyle(div1).left) + div1.offsetWidth / 2 - 5 + "px";  
+                bala.style.top = parseInt(getComputedStyle(div1).top) - 10 + "px";  
+				fundo.appendChild(bala);
+				podeAtirar = false;
+				timerBala = setInterval(() => moveBala(bala), 1);
+				musica = new Audio('audio/tiro.mp3');
+                musica.play(); 
+                musica.volume = 1.80;
+			}
+		}
+		
+		function moveBala(bala) {
+			let top = parseInt(getComputedStyle(bala).top);
+			bala.style.top = top - 3 + "px";
+			if (top <= 0) {
+				bala.parentElement.removeChild(bala);
+				clearInterval(timerBala);
+				podeAtirar = true; //add denv kskskks
+			}
+		}
+		
+		// Função para criar inimigo (mantendo o nome)
+		function inimigo() {
+			const novoInimigo = document.createElement("div");
+			novoInimigo.classList.add("inimigo");
+			fundo.appendChild(novoInimigo);
+		}
+		
+		// Função para criar inimigos em posições aleatórias
+function criarInimigo() {
+    const inimigo = document.createElement("div");
+    inimigo.classList.add("inimigo");
+
+    // Posição inicial aleatória (horizontal aleatória no topo da tela)
+    inimigo.style.left = Math.random() * 85 + "vw";
+    inimigo.style.top = "0px";
+
+    fundo.appendChild(inimigo);
+    inimigos.push(inimigo);
+
+    // Inicia o movimento do inimigo
+    moverInimigo(inimigo);
+}
+
+// Função para movimentar os inimigos
+function moverInimigo(inimigo) {
+    const velocidade = Math.random() * 1 + 1; // Velocidade aleatória,,,,,,eu mideo p entre 1 e 2 
+    const movimento = setInterval(() => {
+        let top = parseInt(getComputedStyle(inimigo).top);
+        inimigo.style.top = top + velocidade + "px";
+
+        if (top >= fundo.offsetHeight) {
+            inimigo.remove();
+            clearInterval(movimento);
+            inimigos = inimigos.filter((el) => el !== inimigo);
+        }
+
+        verificarColisao(inimigo, movimento);
+    }, 30);
+}
+
+function verificarColisao(inimigo, movimento) {
+    const balas = document.querySelectorAll(".bullets");
+
+    balas.forEach((bala) => {
+        const balaRect = bala.getBoundingClientRect();
+        const inimigoRect = inimigo.getBoundingClientRect();
+
+        if (
+            balaRect.left < inimigoRect.right &&
+            balaRect.right > inimigoRect.left &&
+            balaRect.top < inimigoRect.bottom &&
+            balaRect.bottom > inimigoRect.top
+        ) {
+            // Remover bala e inimigo
+            bala.remove();
+            inimigo.remove();
+            clearInterval(movimento);
+
+            // Remover inimigo da lista
+            inimigos = inimigos.filter((el) => el !== inimigo);
+
+			podeAtirar = true;
+        }
+    });
+}
+ 
+function iniciarJogo() {
+    
+    timerCriarInimigo = setInterval(criarInimigo, 4000);
+
+    iniciar();
+}
+
+document.querySelector("#iniciar").addEventListener("click", iniciarJogo);
+
+function iniciarCronometro() {
+            cronometroTimer = setInterval(() => {
+                tempoRestante--;
+                let minutos = Math.floor(tempoRestante / 60);
+                let segundos = tempoRestante % 60;
+                cronometro.textContent = `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+
+                if (tempoRestante <= 0) {
+                    clearInterval(cronometroTimer);
+                    fimDeJogo();
+                }
+            }, 1000);
+        }
+
+		function fimDeJogo() {
+    fimJogo.style.display = "block";
+    clearInterval(timerCriarInimigo); // Para o intervalo que cria novos inimigos
+    clearInterval(cronometroTimer); // Para o cronômetro
+    inimigos.forEach(inimigo => inimigo.remove()); // Remove todos os inimigos da tela
+    inimigos = []; // Limpa  inimigos
+
+    // Desabilitar todos os botões do painel, menos o "Reiniciar".
+    document.querySelectorAll(".painel button").forEach(button => {
+        if (button.id !== "reiniciar") {
+            button.disabled = true; // Desativa os outros botoeews
+        }
+    });
+}
+        </script>		
+	</body>
+</html>

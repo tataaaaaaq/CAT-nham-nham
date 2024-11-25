@@ -1,0 +1,137 @@
+#fundo {
+   position: absolute;
+   top: 5vw;
+   left: 5vw;
+   width: 90vw;
+   height: 40vw;
+   background-image: url("./imagens/background.png");
+   background-size: cover; /* Certifica que a imagem cobre todo o fundo */
+   overflow: hidden; 
+
+}
+
+.inimigo {
+   position: absolute;
+   top: 35vw;
+   left: 35vw;
+   width: 5vw;
+   height: 5vw;
+   background-image: url("./imagens/fantasma.png");
+   background-size: cover; 
+   overflow: hidden; 
+}
+
+#div1 {
+   position: absolute;
+   top: 35vw;
+   left: 35vw;
+   width: 5vw;
+   height: 5vw;
+   overflow: hidden; /*teste*/
+}
+
+#div1 img {
+   width: 100%; /* A imagem ocupa toda a largura do contêiner */
+   height: 100%; /* A imagem ocupa toda a altura do contêiner */
+   object-fit: contain; /* Mantém a proporção da imagem */
+}
+
+.bullets {
+   position: absolute;
+   top: 34vw;
+   width: 2vw;
+   height: 2vw;
+   background-image: url("./imagens/bola_de_fogo.png");
+   background-size: cover; 
+   overflow: hidden; 
+
+}
+
+.painel {
+   position: fixed; 
+   bottom: 10px; 
+   left: 50%; 
+   transform: translateX(-50%); 
+   display: flex;
+   flex-direction: row; 
+   justify-content: space-around; 
+   align-items: center; 
+   gap: 5px; 
+   background-color: rgba(255, 255, 255, 0.8); 
+   padding: 5px 10px; 
+   border-radius: 8px; 
+   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+   z-index: 1000; 
+   max-width: 90%; 
+   height: auto; 
+   min-height: 60px; 
+   max-height: 80px; 
+}
+
+/* aq 6 editam o estilo dos botes, podem mexer p vc se acham um estilo melhro ou algo do tipo */
+button {
+   flex: 1; 
+   padding: 10px; 
+   font-size: 14px; 
+   border: none;
+   border-radius: 5px; 
+   background-color: #4CAF50; 
+   color: white; 
+   cursor: pointer; 
+   transition: all 0.3s ease; 
+   box-shadow: 0 4px #2e7d32; 
+}
+
+/* faz animacao ao xclicar */
+button:active {
+   transform: translateY(3px); 
+   box-shadow: none;
+}
+
+button:hover {
+   background-color: #45a049;
+}
+
+#reiniciar {
+   background-color: #f44336; /* Vermelho para diferenciar*/
+   box-shadow: 0 4px #d32f2f; 
+}
+
+#reiniciar:hover {
+   background-color: #e53935;
+}
+
+#reiniciar:active {
+   transform: translateY(3px);
+   box-shadow: none;
+}
+
+@media (max-width: 768px) {
+   .painel {
+       flex-wrap: wrap; 
+       padding: 8px; 
+       max-width: 100%; 
+       min-height: auto; 
+   }  
+
+   button {
+       padding: 8px; 
+       font-size: 12px; 
+   }
+}
+
+@media (max-width: 480px) {
+   #div1 {
+       width: 15vw; 
+       height: 15vw;
+   }
+
+   .painel {
+       padding: 5px; 
+   }
+
+   button {
+       font-size: 10px; 
+       padding: 6px; 
+   }
+}
