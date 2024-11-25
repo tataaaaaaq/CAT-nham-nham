@@ -121,7 +121,7 @@ button:hover {
 }
 
 @media (max-width: 480px) {
-   #div1 {
+   #div1 img {
        width: 15vw; 
        height: 15vw;
       object-fit:contain;
