@@ -124,6 +124,7 @@ button:hover {
    #div1 {
        width: 15vw; 
        height: 15vw;
+      object-fit:contain;
    }
 
    .painel {
